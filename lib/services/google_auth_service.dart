@@ -30,8 +30,10 @@ class GoogleAuthService {
       return;
     }
 
-    final account = await signIn.authenticate();
-    await _completeSignIn(account);
+    // Successful authentication is delivered through authenticationEvents.
+    // Completing it here as well would sign the user in twice on native
+    // platforms, since authenticate() also emits that event.
+    await signIn.authenticate();
   }
 
   static Future<void> _completeSignIn(GoogleSignInAccount account) async {
