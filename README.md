@@ -22,11 +22,11 @@ application flow.
 
    ```sh
    firebase login
-   flutterfire configure --project YOUR_FIREBASE_PROJECT_ID --platforms android,ios,web,macos
+   flutterfire configure --project YOUR_FIREBASE_PROJECT_ID --platforms ios
    ```
 
-   This creates the native Firebase config files. Keep those files in the
-   project; their API keys identify the app but are not secrets.
+   This creates `ios/Runner/GoogleService-Info.plist`. Keep it in the project;
+   its API keys identify the app but are not secrets.
 
 3. In the Firebase console, enable **Authentication → Sign-in method →
    Anonymous**. This is required because an application is tied to the
