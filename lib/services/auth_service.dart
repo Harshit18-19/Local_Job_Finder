@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_backend_service.dart';
 
 class AuthService {
   static const _keyLoggedIn = 'is_logged_in';
@@ -34,6 +36,29 @@ class AuthService {
 
   static Future<String?> signUp(
       String name, String email, String password) async {
+    if (FirebaseBackendService.isReady) {
+      try {
+        final credential = EmailAuthProvider.credential(
+          email: email,
+          password: password,
+        );
+        final currentUser = FirebaseAuth.instance.currentUser;
+        final user = currentUser?.isAnonymous == true
+            ? (await currentUser!.linkWithCredential(credential)).user!
+            : (await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    email: email, password: password))
+                .user!;
+        await user.updateDisplayName(name);
+      } on FirebaseAuthException catch (error) {
+        return _authMessage(error);
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyName, name);
+      await prefs.setString(_keyEmail, email);
+      await prefs.remove(_keyPassword);
+      await prefs.setBool(_keyLoggedIn, true);
+      return null;
+    }
     final prefs = await SharedPreferences.getInstance();
     final existing = prefs.getString(_keyEmail);
     if (existing != null && existing == email) {
@@ -47,6 +72,24 @@ class AuthService {
   }
 
   static Future<String?> login(String email, String password) async {
+    if (FirebaseBackendService.isReady) {
+      try {
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser?.isAnonymous == true) {
+          await FirebaseAuth.instance.signOut();
+        }
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+      } on FirebaseAuthException catch (error) {
+        return _authMessage(error);
+      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyEmail, email);
+      await prefs.setBool(_keyLoggedIn, true);
+      return null;
+    }
     final prefs = await SharedPreferences.getInstance();
     final storedEmail = prefs.getString(_keyEmail);
     final storedPassword = prefs.getString(_keyPassword);
@@ -65,7 +108,27 @@ class AuthService {
   }
 
   static Future<void> logout() async {
+    if (FirebaseBackendService.isReady) {
+      await FirebaseAuth.instance.signOut();
+    }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyLoggedIn, false);
+  }
+
+  static String _authMessage(FirebaseAuthException error) {
+    switch (error.code) {
+      case 'email-already-in-use':
+        return 'An account already exists for this email.';
+      case 'invalid-credential':
+      case 'wrong-password':
+      case 'user-not-found':
+        return 'Email or password is incorrect.';
+      case 'weak-password':
+        return 'Choose a stronger password.';
+      case 'invalid-email':
+        return 'Enter a valid email address.';
+      default:
+        return error.message ?? 'Authentication failed. Please try again.';
+    }
   }
 }

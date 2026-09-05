@@ -7,11 +7,13 @@ import '../widgets/job_card.dart';
 import '../widgets/featured_job_card.dart';
 import '../widgets/shimmer_card.dart';
 import '../services/auth_service.dart';
+import '../services/firebase_backend_service.dart';
 import 'job_detail_screen.dart';
 import 'login_screen.dart';
 import 'saved_jobs_screen.dart';
 import 'applied_jobs_screen.dart';
 import 'payments_screen.dart';
+import 'reviewer_applications_screen.dart';
 
 class JobListScreen extends StatefulWidget {
   const JobListScreen({super.key});
@@ -34,6 +36,7 @@ class _JobListScreenState extends State<JobListScreen>
   late AnimationController _headerAnim;
   String _userName = '';
   String _userEmail = '';
+  bool _isReviewer = false;
 
   final _categories = [
     'All',
@@ -104,11 +107,14 @@ class _JobListScreenState extends State<JobListScreen>
   Future<void> _loadUser() async {
     final name = await AuthService.getUserName();
     final email = await AuthService.getUserEmail();
-    if (mounted)
+    final isReviewer = await FirebaseBackendService.isReviewer();
+    if (mounted) {
       setState(() {
         _userName = name ?? 'User';
         _userEmail = email ?? '';
+        _isReviewer = isReviewer;
       });
+    }
   }
 
   void _applyFilters() {
@@ -835,6 +841,17 @@ class _JobListScreenState extends State<JobListScreen>
                     MaterialPageRoute(
                         builder: (_) => const AppliedJobsScreen()));
               }),
+              if (_isReviewer) ...[
+                const SizedBox(height: 10),
+                _profileActionTile(Icons.verified_user_rounded,
+                    'Application approvals', 'Review pending applications', () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ReviewerApplicationsScreen()));
+                }),
+              ],
               const SizedBox(height: 10),
               _profileActionTile(Icons.credit_card_rounded, 'Plans & payments',
                   'Manage your JobFinder plan', () {

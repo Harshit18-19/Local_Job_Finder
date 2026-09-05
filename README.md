@@ -31,8 +31,9 @@ application flow.
 
 3. In the Firebase console, enable **Authentication → Sign-in method →
    Anonymous**. This is required because an application is tied to the
-   authenticated submitter. Also enable Email/Password and Google if you decide
-   to migrate the app's existing local login screens to Firebase Auth.
+   authenticated submitter. Enable **Email/Password** as well: it is used for
+   stable applicant and reviewer identities. Google remains an optional sign-in
+   method.
 
 4. Add your project ID to `.firebaserc` (use the sample below), then install
    the Cloud Function dependencies and deploy:
@@ -53,6 +54,12 @@ back in so their token refreshes:
 ```js
 await getAuth().setCustomUserClaims(USER_UID, { role: 'reviewer' });
 ```
+
+Create the reviewer with the app's Email/Password sign-up first, then use that
+Firebase Authentication user's UID in the command. On their next sign-in they
+will see **Application approvals** in the profile sheet. They can approve or
+reject a pending application; the applicant's **Applied jobs** screen updates
+immediately.
 
 The deployed function writes a reviewer notification when a new Firestore
 application is created. Firestore rules prevent applicants from changing their
