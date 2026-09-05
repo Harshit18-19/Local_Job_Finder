@@ -21,6 +21,8 @@ class _ApplyScreenState extends State<ApplyScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _skillsController = TextEditingController();
+  final _profileController = TextEditingController();
   final _coverLetterController = TextEditingController();
   final _form1Key = GlobalKey<FormState>();
   final _form2Key = GlobalKey<FormState>();
@@ -31,6 +33,8 @@ class _ApplyScreenState extends State<ApplyScreen> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _skillsController.dispose();
+    _profileController.dispose();
     _coverLetterController.dispose();
     super.dispose();
   }
@@ -159,7 +163,9 @@ class _ApplyScreenState extends State<ApplyScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            _step == 0 ? 'Step 1: Personal Info' : 'Step 2: Cover Letter',
+            _step == 0
+                ? 'Step 1: Personal Info'
+                : 'Step 2: Profile & Cover Letter',
             style: TextStyle(
                 color: Colors.grey[500],
                 fontSize: 12,
@@ -278,6 +284,13 @@ class _ApplyScreenState extends State<ApplyScreen> {
   }
 
   Widget _buildStep2(bool isDark) {
+    final isTechnicalJob = widget.job.category == 'Technology';
+    final skillsHint = isTechnicalJob
+        ? 'Example: C++, Dart, Flutter, DSA, REST APIs'
+        : 'Example: customer service, communication, sales, scheduling';
+    final profileLabel = isTechnicalJob
+        ? 'Coding profile (LeetCode / GitHub / Portfolio)'
+        : 'Professional profile (LinkedIn / Portfolio)';
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: FadeInRight(
@@ -288,6 +301,48 @@ class _ApplyScreenState extends State<ApplyScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
+              const Text('Skills & Professional Profile',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              Text(
+                isTechnicalJob
+                    ? 'Show your technical strengths and coding profile.'
+                    : 'Show the strengths most relevant to this role.',
+                style: TextStyle(color: Colors.grey[500], fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              _buildField(
+                controller: _skillsController,
+                label: isTechnicalJob
+                    ? 'Technical strengths & skills'
+                    : 'Key strengths & skills',
+                hintText: skillsHint,
+                icon: Icons.workspace_premium_outlined,
+                maxLines: 3,
+                validator: (v) => v!.trim().isEmpty
+                    ? 'Please enter your relevant strengths and skills'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              _buildField(
+                controller: _profileController,
+                label: profileLabel,
+                hintText: isTechnicalJob
+                    ? 'https://leetcode.com/your-profile'
+                    : 'https://linkedin.com/in/your-profile',
+                icon: Icons.link_rounded,
+                keyboardType: TextInputType.url,
+                validator: (v) {
+                  final value = v!.trim();
+                  if (value.isEmpty) return 'Please add your profile link';
+                  if (!value.startsWith('http://') &&
+                      !value.startsWith('https://')) {
+                    return 'Enter a valid link starting with https://';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
               const Text('Cover Letter',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
@@ -344,14 +399,19 @@ class _ApplyScreenState extends State<ApplyScreen> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    String? hintText,
+    int maxLines = 1,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
         prefixIcon: Icon(icon),
+        alignLabelWithHint: maxLines > 1,
       ),
     );
   }
