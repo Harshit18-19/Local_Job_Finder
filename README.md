@@ -25,9 +25,8 @@ application flow.
    flutterfire configure --project YOUR_FIREBASE_PROJECT_ID --platforms android,ios,web,macos
    ```
 
-   This replaces the placeholder `lib/firebase_options.dart` and creates the
-   native Firebase config files. Keep those files in the project; their API
-   keys identify the app but are not secrets.
+   This creates the native Firebase config files. Keep those files in the
+   project; their API keys identify the app but are not secrets.
 
 3. In the Firebase console, enable **Authentication → Sign-in method →
    Anonymous**. This is required because an application is tied to the

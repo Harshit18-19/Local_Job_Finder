@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 
 /// Keeps the app usable until a Firebase project has been configured, while
 /// making application submission fail clearly instead of silently saving local data.
@@ -12,9 +11,7 @@ class FirebaseBackendService {
 
   static Future<void> initialize() async {
     try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      await Firebase.initializeApp();
       await ensureSignedIn();
       isReady = true;
     } catch (_) {
