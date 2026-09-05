@@ -4,11 +4,13 @@ import 'screens/job_list_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/auth_service.dart';
+import 'services/firebase_backend_service.dart';
 
 final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FirebaseBackendService.initialize();
   final loggedIn = await AuthService.isLoggedIn();
   final onboardingComplete = await AuthService.hasCompletedOnboarding();
   runApp(LocalJobApp(

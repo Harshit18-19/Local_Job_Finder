@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../models/job.dart';
-import '../services/applied_jobs_service.dart';
+import '../services/application_service.dart';
 
 class ApplyScreen extends StatefulWidget {
   final Job job;
@@ -57,8 +57,29 @@ class _ApplyScreenState extends State<ApplyScreen> {
 
   Future<void> _submit() async {
     setState(() => _submitting = true);
-    await Future.delayed(const Duration(seconds: 2));
-    await AppliedJobsService.add(widget.job.id);
+    try {
+      await ApplicationService.submit(
+        job: widget.job,
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        skills: _skillsController.text.trim(),
+        profileUrl: _profileController.text.trim(),
+        coverLetter: _coverLetterController.text.trim(),
+      );
+    } on StateError catch (error) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+      return;
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Could not submit your application. Please try again.'),
+      ));
+      return;
+    }
     if (!mounted) return;
     setState(() {
       _submitting = false;

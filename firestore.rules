@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function reviewer() { return signedIn() && request.auth.token.role == 'reviewer'; }
+
+    match /applications/{applicationId} {
+      allow create: if signedIn()
+        && request.resource.data.applicantId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+          'applicantId', 'applicantName', 'applicantEmail', 'applicantPhone',
+          'skills', 'profileUrl', 'coverLetter', 'jobId', 'jobTitle', 'company',
+          'status', 'createdAt', 'updatedAt'
+        ]);
+      allow read: if signedIn()
+        && (resource.data.applicantId == request.auth.uid || reviewer());
+      allow update: if reviewer()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'reviewerNote', 'reviewedAt', 'updatedAt'
+        ])
+        && request.resource.data.status in ['approved', 'rejected'];
+      allow delete: if false;
+    }
+
+    // Written only by Cloud Functions using the Admin SDK. Reviewers may read
+    // their queue after a role custom claim has been assigned.
+    match /reviewerNotifications/{notificationId} {
+      allow read: if reviewer();
+      allow write: if false;
+    }
+  }
+}

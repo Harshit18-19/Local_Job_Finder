@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
-import '../models/job.dart';
-import '../models/job_data.dart';
-import '../services/applied_jobs_service.dart';
-import 'job_detail_screen.dart';
+import '../models/application.dart';
+import '../services/application_service.dart';
 
 class AppliedJobsScreen extends StatefulWidget {
   const AppliedJobsScreen({super.key});
@@ -13,24 +11,6 @@ class AppliedJobsScreen extends StatefulWidget {
 }
 
 class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
-  List<Job> _jobs = [];
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final ids = await AppliedJobsService.getAppliedIds();
-    if (!mounted) return;
-    setState(() {
-      _jobs = sampleJobs.where((job) => ids.contains(job.id)).toList();
-      _loading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -42,18 +22,23 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
             style: TextStyle(fontWeight: FontWeight.w800)),
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _jobs.isEmpty
-              ? _buildEmpty()
-              : ListView(
+      body: StreamBuilder<List<JobApplication>>(
+        stream: ApplicationService.mine(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) return _buildError();
+          if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+          final applications = snapshot.data!;
+          if (applications.isEmpty) return _buildEmpty();
+          return ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                   children: [
                     _approvalHeader(isDark),
                     const SizedBox(height: 16),
-                    ..._jobs.map(_jobTile),
+                    ...applications.map(_applicationTile),
                   ],
-                ),
+                );
+        },
+      ),
     );
   }
 
@@ -84,24 +69,30 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
         ),
       );
 
-  Widget _jobTile(Job job) {
-    final accent = Color(job.cardColor);
+  Widget _applicationTile(JobApplication application) {
+    final approved = application.status == 'approved';
+    final rejected = application.status == 'rejected';
+    final color = approved
+        ? const Color(0xFF059669)
+        : rejected ? const Color(0xFFDC2626) : const Color(0xFFEA580C);
+    final icon = approved
+        ? Icons.check_circle_rounded
+        : rejected ? Icons.cancel_rounded : Icons.hourglass_top_rounded;
+    final status = approved
+        ? 'Approved by employer'
+        : rejected ? 'Not selected' : 'Pending employer approval';
     return FadeInUp(
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (_) => JobDetailScreen(job: job))),
-          child: Padding(
+        child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
                 CircleAvatar(
-                    backgroundColor: accent,
-                    child: Text(job.company[0],
+                    backgroundColor: color,
+                    child: Text(application.company.isEmpty ? '?' : application.company[0],
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold))),
                 const SizedBox(width: 12),
@@ -109,31 +100,41 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      Text(job.title,
+                      Text(application.jobTitle,
                           style: const TextStyle(fontWeight: FontWeight.w800)),
                       const SizedBox(height: 3),
-                      Text(job.company,
+                      Text(application.company,
                           style:
                               TextStyle(color: Colors.grey[600], fontSize: 13)),
                       const SizedBox(height: 10),
-                      const Row(children: [
-                        Icon(Icons.hourglass_top_rounded,
-                            size: 15, color: Color(0xFFEA580C)),
-                        SizedBox(width: 5),
-                        Text('Pending employer approval',
-                            style: TextStyle(
-                                color: Color(0xFFEA580C),
+                      Row(children: [
+                        Icon(icon, size: 15, color: color),
+                        const SizedBox(width: 5),
+                        Text(status,
+                            style: TextStyle(color: color,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700)),
                       ]),
+                      if (application.reviewerNote?.isNotEmpty ?? false) ...[
+                        const SizedBox(height: 6),
+                        Text(application.reviewerNote!,
+                            style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      ],
                     ])),
               ],
             ),
           ),
-        ),
       ),
-    );
+      );
   }
+
+  Widget _buildError() => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text('Unable to load applications. Check your Firebase connection and security rules.',
+              textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600])),
+        ),
+      );
 
   Widget _buildEmpty() => Center(
         child: FadeIn(
