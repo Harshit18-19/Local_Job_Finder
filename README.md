@@ -47,9 +47,10 @@ application flow.
 
 ## Reviewer access
 
-Reviewer access is deliberately server-controlled. Assign the custom claim with
-the Admin SDK in a trusted environment, then have the reviewer sign out and
-back in so their token refreshes:
+The supplied initial reviewer Firebase UID is already secured in the app and
+Firestore rules. For additional reviewers, assign the custom claim with the
+Admin SDK in a trusted environment, then have the reviewer sign out and back
+in so their token refreshes:
 
 ```js
 await getAuth().setCustomUserClaims(USER_UID, { role: 'reviewer' });

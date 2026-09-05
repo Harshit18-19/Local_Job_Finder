@@ -5,6 +5,9 @@ import '../firebase_options.dart';
 /// Keeps the app usable until a Firebase project has been configured, while
 /// making application submission fail clearly instead of silently saving local data.
 class FirebaseBackendService {
+  // Initial employer/reviewer Firebase Auth account. Additional reviewers should
+  // receive the `reviewer` custom claim through the Firebase Admin SDK.
+  static const _initialReviewerUid = 'kruxRHEHvzcJHNjnRXO7fB9XbZy2';
   static bool isReady = false;
 
   static Future<void> initialize() async {
@@ -32,7 +35,9 @@ class FirebaseBackendService {
 
   static Future<bool> isReviewer() async {
     if (!isReady) return false;
-    final token = await ensureSignedIn().then((user) => user.getIdTokenResult(true));
+    final user = await ensureSignedIn();
+    if (user.uid == _initialReviewerUid) return true;
+    final token = await user.getIdTokenResult(true);
     return token.claims?['role'] == 'reviewer';
   }
 }
