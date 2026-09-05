@@ -66,6 +66,31 @@ class _ApplyScreenState extends State<ApplyScreen> {
     });
   }
 
+  Future<bool> _confirmStopApplying() async {
+    if (_submitting) return false;
+
+    final shouldStop = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Stop applying?'),
+        content: const Text(
+          'Your application has not been submitted. Are you sure you want to stop applying?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep Applying'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Stop Applying'),
+          ),
+        ],
+      ),
+    );
+    return shouldStop ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -73,31 +98,34 @@ class _ApplyScreenState extends State<ApplyScreen> {
 
     if (_submitted) return _SuccessScreen(job: widget.job, accent: accent);
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        title: const Text('Apply for Job',
-            style: TextStyle(fontWeight: FontWeight.w700)),
-        centerTitle: false,
-        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-      ),
-      body: Column(
-        children: [
-          _buildProgressBar(accent, isDark),
-          _buildJobBanner(accent, isDark),
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                _buildStep1(isDark),
-                _buildStep2(isDark),
-              ],
+    return WillPopScope(
+      onWillPop: _confirmStopApplying,
+      child: Scaffold(
+        backgroundColor:
+            isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+        appBar: AppBar(
+          title: const Text('Apply for Job',
+              style: TextStyle(fontWeight: FontWeight.w700)),
+          centerTitle: false,
+          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        ),
+        body: Column(
+          children: [
+            _buildProgressBar(accent, isDark),
+            _buildJobBanner(accent, isDark),
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _buildStep1(isDark),
+                  _buildStep2(isDark),
+                ],
+              ),
             ),
-          ),
-          _buildBottomBar(accent),
-        ],
+            _buildBottomBar(accent),
+          ],
+        ),
       ),
     );
   }
