@@ -14,6 +14,7 @@ import 'saved_jobs_screen.dart';
 import 'applied_jobs_screen.dart';
 import 'payments_screen.dart';
 import 'reviewer_applications_screen.dart';
+import 'local_needs_screen.dart';
 
 class JobListScreen extends StatefulWidget {
   const JobListScreen({super.key});
@@ -181,6 +182,8 @@ class _JobListScreenState extends State<JobListScreen>
           _buildSliverHeader(isDark),
           SliverToBoxAdapter(child: _buildSearchBar(isDark)),
           SliverToBoxAdapter(child: _buildStatsRow(isDark)),
+          if (!_loading && !_searchFocused)
+            SliverToBoxAdapter(child: _buildLocalNeedsCard(isDark)),
           SliverToBoxAdapter(child: _buildCategoryChips(isDark)),
           if (!_loading && !_searchFocused && _selectedCategory == 'All')
             SliverToBoxAdapter(child: _buildFeaturedSection()),
@@ -468,6 +471,73 @@ class _JobListScreenState extends State<JobListScreen>
           _statCard('$remote', 'Remote', Icons.laptop_mac_rounded,
               const Color(0xFF7C3AED), isDark),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLocalNeedsCard(bool isDark) {
+    final topCategories = <String, int>{};
+    for (final job in sampleJobs) {
+      topCategories.update(job.category, (count) => count + 1,
+          ifAbsent: () => 1);
+    }
+    final leadingCategory = topCategories.entries.reduce(
+      (a, b) => a.value >= b.value ? a : b,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Material(
+        color: isDark ? const Color(0xFF172554) : const Color(0xFFEAF2FF),
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const LocalNeedsScreen()),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.handshake_rounded,
+                      color: Color(0xFF2563EB)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Local Hiring Pulse',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Employers need ${leadingCategory.key} talent. Find work that fits you.',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 12,
+                            height: 1.3,
+                            color: isDark ? Colors.white70 : Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_ios_rounded,
+                    size: 16, color: Color(0xFF2563EB)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
