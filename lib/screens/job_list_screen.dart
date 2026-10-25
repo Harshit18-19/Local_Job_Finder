@@ -15,6 +15,7 @@ import 'applied_jobs_screen.dart';
 import 'payments_screen.dart';
 import 'reviewer_applications_screen.dart';
 import 'local_needs_screen.dart';
+import 'resume_evaluation_screen.dart';
 
 class JobListScreen extends StatefulWidget {
   const JobListScreen({super.key});
@@ -887,7 +888,14 @@ class _JobListScreenState extends State<JobListScreen>
                       style: TextStyle(fontSize: 12)),
                   children: [
                     _profileMenuTile(Icons.badge_outlined, 'Profile & resume',
-                        'Complete your professional profile'),
+                        'Upload a PDF and check ATS readiness', onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const ResumeEvaluationScreen()),
+                      );
+                    }),
                     _profileMenuTile(Icons.notifications_none_rounded,
                         'Job alerts', 'Manage alerts and recommendations'),
                     _profileMenuTile(Icons.tune_rounded, 'Search preferences',
@@ -969,7 +977,8 @@ class _JobListScreenState extends State<JobListScreen>
     );
   }
 
-  Widget _profileMenuTile(IconData icon, String title, String subtitle) =>
+  Widget _profileMenuTile(IconData icon, String title, String subtitle,
+          {VoidCallback? onTap}) =>
       ListTile(
         dense: true,
         leading: Icon(icon, size: 20),
@@ -977,9 +986,10 @@ class _JobListScreenState extends State<JobListScreen>
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 11)),
         trailing: const Icon(Icons.chevron_right_rounded),
-        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$title will be available soon.')),
-        ),
+        onTap: onTap ??
+            () => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('$title will be available soon.')),
+                ),
       );
 
   Widget _profileActionTile(

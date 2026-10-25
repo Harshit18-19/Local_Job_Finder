@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'screens/job_list_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -10,6 +11,7 @@ final themeNotifier = ValueNotifier<ThemeMode>(ThemeMode.light);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await pdfrxFlutterInitialize();
   await FirebaseBackendService.initialize();
   final loggedIn = await AuthService.isLoggedIn();
   final onboardingComplete = await AuthService.hasCompletedOnboarding();

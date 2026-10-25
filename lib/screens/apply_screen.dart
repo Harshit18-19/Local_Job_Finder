@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../models/job.dart';
 import '../services/application_service.dart';
+import 'resume_evaluation_screen.dart';
 
 class ApplyScreen extends StatefulWidget {
   final Job job;
@@ -390,6 +391,23 @@ class _ApplyScreenState extends State<ApplyScreen> {
                   }
                   return null;
                 },
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ResumeEvaluationScreen(initialJob: widget.job),
+                  ),
+                ),
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: const Text('Upload PDF & get a free ATS score'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                ),
               ),
               const SizedBox(height: 24),
               const Text('Cover Letter',
