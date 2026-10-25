@@ -204,6 +204,12 @@ class _ResumeEvaluationScreenState extends State<ResumeEvaluationScreen> {
             const SizedBox(height: 22),
             _buildResults(evaluation, isDark),
           ],
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: () => Navigator.of(context).maybePop(),
+            icon: const Icon(Icons.close_rounded),
+            label: const Text('Cancel and skip resume'),
+          ),
           const SizedBox(height: 20),
           _safeResumeTips(isDark),
         ],
@@ -285,13 +291,25 @@ class _ResumeEvaluationScreenState extends State<ResumeEvaluationScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              _resumeFile == null ? 'Choose' : 'Change',
-              style: const TextStyle(
-                color: Color(0xFF2563EB),
-                fontWeight: FontWeight.w700,
+            if (_resumeFile == null)
+              const Text(
+                'Choose',
+                style: TextStyle(
+                  color: Color(0xFF2563EB),
+                  fontWeight: FontWeight.w700,
+                ),
+              )
+            else
+              TextButton(
+                onPressed: _working
+                    ? null
+                    : () => setState(() {
+                        _resumeFile = null;
+                        _evaluation = null;
+                        _error = null;
+                      }),
+                child: const Text('Cancel'),
               ),
-            ),
           ],
         ),
       ),
