@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -9,7 +10,6 @@ class PaymentsScreen extends StatefulWidget {
 
 class _PaymentsScreenState extends State<PaymentsScreen> {
   int _selectedPlan = 1;
-  String _paymentMethod = 'UPI';
 
   final _plans = const [
     _Plan('Starter', '₹0', 'Perfect for browsing local jobs',
@@ -60,33 +60,16 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
           ...List.generate(_plans.length,
               (index) => _planCard(_plans[index], index, isDark)),
           const SizedBox(height: 16),
-          const Text('Payment method',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          ...[
-            'UPI',
-            'Credit / Debit Card',
-            'Net Banking'
-          ].map((method) => RadioListTile<String>(
-                contentPadding: EdgeInsets.zero,
-                value: method,
-                groupValue: _paymentMethod,
-                title: Text(method,
-                    style: const TextStyle(fontWeight: FontWeight.w600)),
-                secondary: Icon(method == 'UPI'
-                    ? Icons.qr_code_rounded
-                    : method.startsWith('Credit')
-                        ? Icons.credit_card_rounded
-                        : Icons.account_balance_rounded),
-                onChanged: (value) => setState(() => _paymentMethod = value!),
-              )),
-          const SizedBox(height: 12),
+          const Text(
+              'Pay securely with Razorpay using the methods available on checkout.',
+              style: TextStyle(height: 1.4)),
+          const SizedBox(height: 16),
           SizedBox(
               height: 54,
               child: ElevatedButton(
                 onPressed: _selectedPlan == 0
                     ? () => Navigator.pop(context)
-                    : _showDemoNotice,
+                    : _openRazorpay,
                 style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16))),
@@ -97,7 +80,8 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
                     style: const TextStyle(fontWeight: FontWeight.w800)),
               )),
           const SizedBox(height: 12),
-          Text('Demo checkout only — no payment will be collected.',
+          Text(
+              'Payment is completed on Razorpay. Plan activation is not automatic.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[500], fontSize: 12)),
         ],
@@ -157,24 +141,22 @@ class _PaymentsScreenState extends State<PaymentsScreen> {
     );
   }
 
-  void _showDemoNotice() => showModalBottomSheet(
-        context: context,
-        builder: (_) => Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.lock_outline_rounded,
-                  color: Color(0xFF059669), size: 42),
-              const SizedBox(height: 14),
-              const Text('Secure checkout ready',
-                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 8),
-              Text(
-                  '$_paymentMethod is selected. Connect a provider such as Razorpay or Stripe to accept real payments.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey[600], height: 1.4)),
-              const SizedBox(height: 18),
-            ])),
+  Future<void> _openRazorpay() async {
+    final uri = Uri.parse('https://razorpay.me/@harshitrai1056');
+    try {
+      final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!opened && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open Razorpay checkout.')),
+        );
+      }
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open Razorpay checkout.')),
       );
+    }
+  }
 }
 
 class _Plan {
