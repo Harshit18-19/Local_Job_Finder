@@ -31,7 +31,9 @@ class JobApplication {
     this.createdAt,
   });
 
-  factory JobApplication.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory JobApplication.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return JobApplication(
       id: doc.id,
@@ -47,6 +49,25 @@ class JobApplication {
       coverLetter: data['coverLetter'] as String? ?? '',
       reviewerNote: data['reviewerNote'] as String?,
       createdAt: data['createdAt'] as Timestamp?,
+    );
+  }
+
+  factory JobApplication.fromLocal(Map<String, dynamic> data) {
+    return JobApplication(
+      id: data['id'] as String? ?? '',
+      jobId: data['jobId'] as String? ?? '',
+      jobTitle: data['jobTitle'] as String? ?? 'Job',
+      company: data['company'] as String? ?? '',
+      status: data['status'] as String? ?? 'local',
+      applicantName: data['applicantName'] as String? ?? '',
+      applicantEmail: data['applicantEmail'] as String? ?? '',
+      applicantPhone: data['applicantPhone'] as String? ?? '',
+      skills: data['skills'] as String? ?? '',
+      profileUrl: data['profileUrl'] as String? ?? '',
+      coverLetter: data['coverLetter'] as String? ?? '',
+      createdAt: Timestamp.fromMillisecondsSinceEpoch(
+        data['createdAtMs'] as int? ?? 0,
+      ),
     );
   }
 }

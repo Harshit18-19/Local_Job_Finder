@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 import '../models/job.dart';
 import '../services/application_service.dart';
+import 'applied_jobs_screen.dart';
 import 'resume_evaluation_screen.dart';
 
 class ApplyScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class _ApplyScreenState extends State<ApplyScreen> {
   int _step = 0;
   bool _submitting = false;
   bool _submitted = false;
+  bool _sentToFirebase = false;
 
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -58,8 +60,9 @@ class _ApplyScreenState extends State<ApplyScreen> {
 
   Future<void> _submit() async {
     setState(() => _submitting = true);
+    var sentToFirebase = false;
     try {
-      await ApplicationService.submit(
+      sentToFirebase = await ApplicationService.submit(
         job: widget.job,
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
@@ -85,6 +88,7 @@ class _ApplyScreenState extends State<ApplyScreen> {
     setState(() {
       _submitting = false;
       _submitted = true;
+      _sentToFirebase = sentToFirebase;
     });
   }
 
@@ -118,7 +122,13 @@ class _ApplyScreenState extends State<ApplyScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final accent = Color(widget.job.cardColor);
 
-    if (_submitted) return _SuccessScreen(job: widget.job, accent: accent);
+    if (_submitted) {
+      return _SuccessScreen(
+        job: widget.job,
+        accent: accent,
+        sentToFirebase: _sentToFirebase,
+      );
+    }
 
     return WillPopScope(
       onWillPop: _confirmStopApplying,
@@ -544,8 +554,13 @@ class _ApplyScreenState extends State<ApplyScreen> {
 class _SuccessScreen extends StatelessWidget {
   final Job job;
   final Color accent;
+  final bool sentToFirebase;
 
-  const _SuccessScreen({required this.job, required this.accent});
+  const _SuccessScreen({
+    required this.job,
+    required this.accent,
+    required this.sentToFirebase,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -575,9 +590,14 @@ class _SuccessScreen extends StatelessWidget {
               const SizedBox(height: 28),
               FadeInUp(
                 delay: const Duration(milliseconds: 200),
-                child: const Text(
-                  '🎉 Application Sent!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                child: Text(
+                  sentToFirebase
+                      ? '🎉 Application Sent!'
+                      : 'Application Saved on Device',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -585,7 +605,9 @@ class _SuccessScreen extends StatelessWidget {
               FadeInUp(
                 delay: const Duration(milliseconds: 300),
                 child: Text(
-                  'Your application for ${job.title} at ${job.company} has been submitted successfully.',
+                  sentToFirebase
+                      ? 'Your application for ${job.title} at ${job.company} has been submitted successfully.'
+                      : 'Your application for ${job.title} at ${job.company} is saved in Applied Jobs on this device, but was not sent to the employer because Firebase is unavailable.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.grey[500], fontSize: 14, height: 1.6),
@@ -658,6 +680,17 @@ class _SuccessScreen extends StatelessWidget {
                             color: Colors.white)),
                   ),
                 ),
+              ),
+              const SizedBox(height: 10),
+              TextButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AppliedJobsScreen(),
+                  ),
+                ),
+                icon: const Icon(Icons.assignment_outlined),
+                label: const Text('View Applied Jobs'),
               ),
             ],
           ),

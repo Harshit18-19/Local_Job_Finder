@@ -77,6 +77,7 @@ class _ResumeEvaluationScreenState extends State<ResumeEvaluationScreen> {
 
     PdfDocument? document;
     try {
+      await pdfrxFlutterInitialize();
       final bytes = await file.readAsBytes();
       if (bytes.length > _maxFileBytes) {
         throw const _ResumeCheckException('Choose a PDF smaller than 12 MB.');

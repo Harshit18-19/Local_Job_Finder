@@ -15,15 +15,6 @@ class FirebaseBackendService {
       await Firebase.initializeApp();
       isReady = true;
       initializationError = null;
-
-      // Anonymous auth is useful before sign-in, but it is optional. In
-      // particular, a disabled Anonymous provider must not make a valid Firebase
-      // app look unconfigured or force email sign-in onto the local fallback.
-      try {
-        await ensureSignedIn();
-      } catch (_) {
-        // A user can still sign in with an enabled provider later.
-      }
     } catch (_) {
       isReady = false;
       initializationError = 'Firebase could not initialize for this platform.';

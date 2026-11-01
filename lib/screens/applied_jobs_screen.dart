@@ -25,7 +25,10 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
       body: StreamBuilder<List<JobApplication>>(
         stream: ApplicationService.mine(),
         builder: (context, snapshot) {
-          if (snapshot.hasError) return _buildError();
+          if (snapshot.hasError &&
+              (!snapshot.hasData || snapshot.data!.isEmpty)) {
+            return _buildError();
+          }
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
           final applications = snapshot.data!;
           if (applications.isEmpty) return _buildEmpty();
@@ -57,10 +60,10 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Awaiting approval',
+                  Text('Application status',
                       style: TextStyle(fontWeight: FontWeight.w800)),
                   SizedBox(height: 3),
-                  Text('Employers will review your applications here.',
+                  Text('Applications sent to employers are reviewed here. Local-only items are marked on their card.',
                       style: TextStyle(fontSize: 12)),
                 ],
               ),
@@ -72,15 +75,28 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
   Widget _applicationTile(JobApplication application) {
     final approved = application.status == 'approved';
     final rejected = application.status == 'rejected';
+    final localOnly = application.status == 'local';
     final color = approved
         ? const Color(0xFF059669)
-        : rejected ? const Color(0xFFDC2626) : const Color(0xFFEA580C);
+        : rejected
+            ? const Color(0xFFDC2626)
+            : localOnly
+                ? const Color(0xFF64748B)
+                : const Color(0xFFEA580C);
     final icon = approved
         ? Icons.check_circle_rounded
-        : rejected ? Icons.cancel_rounded : Icons.hourglass_top_rounded;
+        : rejected
+            ? Icons.cancel_rounded
+            : localOnly
+                ? Icons.phone_iphone_rounded
+                : Icons.hourglass_top_rounded;
     final status = approved
         ? 'Approved by employer'
-        : rejected ? 'Not selected' : 'Pending employer approval';
+        : rejected
+            ? 'Not selected'
+            : localOnly
+                ? 'Saved on device only — not sent'
+                : 'Pending employer approval';
     return FadeInUp(
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
