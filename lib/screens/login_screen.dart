@@ -76,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goHome() {
+    FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const JobListScreen()),

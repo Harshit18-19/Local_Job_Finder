@@ -8,21 +8,33 @@ class FirebaseBackendService {
   // receive the `reviewer` custom claim through the Firebase Admin SDK.
   static const _initialReviewerUid = 'kruxRHEHvzcJHNjnRXO7fB9XbZy2';
   static bool isReady = false;
+  static String? initializationError;
 
   static Future<void> initialize() async {
     try {
       await Firebase.initializeApp();
-      await ensureSignedIn();
       isReady = true;
+      initializationError = null;
+
+      // Anonymous auth is useful before sign-in, but it is optional. In
+      // particular, a disabled Anonymous provider must not make a valid Firebase
+      // app look unconfigured or force email sign-in onto the local fallback.
+      try {
+        await ensureSignedIn();
+      } catch (_) {
+        // A user can still sign in with an enabled provider later.
+      }
     } catch (_) {
       isReady = false;
+      initializationError = 'Firebase could not initialize for this platform.';
     }
   }
 
   static Future<User> ensureSignedIn() async {
-    if (!isReady && Firebase.apps.isEmpty) {
+    if (!isReady) {
       throw StateError(
-        'Firebase is not configured. Add your Firebase app configuration first.',
+        initializationError ??
+            'Firebase is not configured. Add this platform to the Firebase project first.',
       );
     }
     final existing = FirebaseAuth.instance.currentUser;

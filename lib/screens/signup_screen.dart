@@ -32,6 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _finishGoogleLogin() {
     if (!mounted) return;
+    FocusManager.instance.primaryFocus?.unfocus();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const JobListScreen()),
@@ -67,6 +68,7 @@ class _SignupScreenState extends State<SignupScreen> {
         _error = err;
       });
     } else {
+      FocusManager.instance.primaryFocus?.unfocus();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const JobListScreen()),
