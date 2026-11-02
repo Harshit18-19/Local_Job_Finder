@@ -57,7 +57,7 @@ class FeaturedJobCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -109,6 +109,8 @@ class FeaturedJobCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text(
                     job.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 17,
@@ -118,6 +120,8 @@ class FeaturedJobCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     job.company,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.8),
                         fontSize: 13),
