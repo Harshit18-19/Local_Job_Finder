@@ -16,6 +16,7 @@ import 'payments_screen.dart';
 import 'reviewer_applications_screen.dart';
 import 'local_needs_screen.dart';
 import 'resume_evaluation_screen.dart';
+import 'help_support_screen.dart';
 
 class JobListScreen extends StatefulWidget {
   const JobListScreen({super.key});
@@ -940,8 +941,12 @@ class _JobListScreenState extends State<JobListScreen>
               const SizedBox(height: 10),
               _profileActionTile(Icons.help_outline_rounded, 'Help & support',
                   'FAQs and contact support', () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Support centre coming soon.')));
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const HelpSupportScreen()),
+                );
               }),
               const SizedBox(height: 20),
               SizedBox(
