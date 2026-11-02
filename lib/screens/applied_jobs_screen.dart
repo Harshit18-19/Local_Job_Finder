@@ -33,39 +33,125 @@ class _AppliedJobsScreenState extends State<AppliedJobsScreen> {
           final applications = snapshot.data!;
           if (applications.isEmpty) return _buildEmpty();
           return ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                  children: [
-                    _approvalHeader(isDark),
-                    const SizedBox(height: 16),
-                    ...applications.map(_applicationTile),
-                  ],
-                );
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            children: [
+              _notificationBar(applications, isDark),
+              const SizedBox(height: 16),
+              ...applications.map(_applicationTile),
+            ],
+          );
         },
       ),
     );
   }
 
-  Widget _approvalHeader(bool isDark) => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFF7ED),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFFED7AA)),
-        ),
-        child: const Row(
+  Widget _notificationBar(List<JobApplication> applications, bool isDark) {
+    final pending =
+        applications.where((item) => item.status == 'pending').length;
+    final approved =
+        applications.where((item) => item.status == 'approved').length;
+    final rejected =
+        applications.where((item) => item.status == 'rejected').length;
+    final localOnly =
+        applications.where((item) => item.status == 'local').length;
+    final updateCount = pending + approved + rejected + localOnly;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.notifications_active_outlined,
+                  color: Color(0xFF2563EB)),
+              const SizedBox(width: 9),
+              const Expanded(
+                child: Text('Application notifications',
+                    style: TextStyle(fontWeight: FontWeight.w800)),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '$updateCount',
+                  style: const TextStyle(
+                    color: Color(0xFF2563EB),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (pending > 0)
+            _noticeLine(
+              icon: Icons.hourglass_top_rounded,
+              color: const Color(0xFFEA580C),
+              text:
+                  '$pending application${pending == 1 ? '' : 's'} pending review. This page updates when a reviewer records a decision.',
+            ),
+          if (approved > 0)
+            _noticeLine(
+              icon: Icons.check_circle_outline_rounded,
+              color: const Color(0xFF059669),
+              text:
+                  '$approved application${approved == 1 ? '' : 's'} approved. Check the application card for any reviewer note. Approval is not a job offer.',
+            ),
+          if (rejected > 0)
+            _noticeLine(
+              icon: Icons.cancel_outlined,
+              color: const Color(0xFFDC2626),
+              text:
+                  '$rejected application${rejected == 1 ? '' : 's'} rejected. Check the application card for any reviewer note.',
+            ),
+          if (localOnly > 0)
+            _noticeLine(
+              icon: Icons.phone_iphone_rounded,
+              color: const Color(0xFF64748B),
+              text:
+                  '$localOnly application${localOnly == 1 ? '' : 's'} saved on this device only. These were not sent to the backend.',
+            ),
+          if (updateCount == 0)
+            Text(
+              'Application updates will appear here.',
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _noticeLine({
+    required IconData icon,
+    required Color color,
+    required String text,
+  }) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.hourglass_top_rounded, color: Color(0xFFEA580C)),
-            SizedBox(width: 12),
+            Icon(icon, color: color, size: 17),
+            const SizedBox(width: 8),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Application status',
-                      style: TextStyle(fontWeight: FontWeight.w800)),
-                  SizedBox(height: 3),
-                  Text('Applications sent to employers are reviewed here. Local-only items are marked on their card.',
-                      style: TextStyle(fontSize: 12)),
-                ],
+              child: Text(
+                text,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
               ),
             ),
           ],
