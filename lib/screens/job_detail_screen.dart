@@ -140,6 +140,26 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               fontSize: 14,
                             ),
                           ),
+                          if (widget.job.isTopTier) ...[
+                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Text(
+                                '★  TOP TIER',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -151,7 +171,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           SliverToBoxAdapter(
             child: Column(
               children: [
-                _buildStatsRow(accent, isDark),
+                if (!widget.job.isTopTier) _buildStatsRow(accent, isDark),
                 _buildInfoSection(accent, isDark),
                 _buildAboutSection(isDark),
                 _buildRequirementsSection(accent, isDark),
@@ -255,6 +275,22 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               value: widget.job.salary,
               isDark: isDark,
             ),
+            if (widget.job.isTopTier) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF7ED),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFFED7AA)),
+                ),
+                child: const Text(
+                  'Demo listing: this role and ₹40 LPA+ package range are illustrative, not a verified vacancy or company offer. Applying here does not submit to the company. Confirm openings and apply on its official careers site.',
+                  style: TextStyle(fontSize: 12, height: 1.4),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             _InfoTile(
               icon: Icons.category_rounded,

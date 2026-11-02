@@ -401,6 +401,8 @@ class _ResumeEvaluationScreenState extends State<ResumeEvaluationScreen> {
         ...evaluation.categories.map(
           (category) => _categoryCard(category, isDark),
         ),
+        const SizedBox(height: 4),
+        _suggestionsCard(evaluation, isDark),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(15),
@@ -419,6 +421,81 @@ class _ResumeEvaluationScreenState extends State<ResumeEvaluationScreen> {
       ],
     );
   }
+
+  Widget _suggestionsCard(
+    ResumeAtsEvaluation evaluation,
+    bool isDark,
+  ) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: const Color(0xFF2563EB).withValues(alpha: .2)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.edit_note_rounded, color: Color(0xFF2563EB)),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'What to change next',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Suggestions are based on this resume and the selected ${_targetJob.title} job. Use only details that are true for you.',
+          style: TextStyle(color: Colors.grey[500], fontSize: 12, height: 1.4),
+        ),
+        const SizedBox(height: 12),
+        ...evaluation.suggestions
+            .take(5)
+            .toList()
+            .asMap()
+            .entries
+            .map(
+              (entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 22,
+                      height: 22,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2563EB).withValues(alpha: .1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        '${entry.key + 1}',
+                        style: const TextStyle(
+                          color: Color(0xFF2563EB),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        entry.value,
+                        style: const TextStyle(fontSize: 12, height: 1.45),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+      ],
+    ),
+  );
 
   Widget _categoryCard(ResumeAtsCategory category, bool isDark) {
     final progress = category.maximum == 0

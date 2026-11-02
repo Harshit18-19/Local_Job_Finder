@@ -32,7 +32,7 @@ class _JobListScreenState extends State<JobListScreen>
   String _selectedCategory = 'All';
   String _selectedType = 'All';
   String _sortBy = 'Distance';
-  double _maxSalaryLakh = 20;
+  double _maxSalaryLakh = 80;
   List<Job> _filtered = [];
   bool _loading = true;
   bool _searchFocused = false;
@@ -1059,7 +1059,7 @@ class _JobListScreenState extends State<JobListScreen>
             _selectedType = 'All';
             _selectedCategory = 'All';
             _sortBy = 'Distance';
-            _maxSalaryLakh = 20;
+            _maxSalaryLakh = 80;
             _searchController.clear();
           });
           _applyFilters();
@@ -1259,7 +1259,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
               const Spacer(),
               Text(
-                _maxSalary >= 20
+                _maxSalary >= 80
                     ? 'Any'
                     : '₹${_maxSalary.toStringAsFixed(0)}L/yr',
                 style: const TextStyle(
@@ -1272,8 +1272,8 @@ class _FilterSheetState extends State<_FilterSheet> {
           Slider(
             value: _maxSalary,
             min: 2,
-            max: 20,
-            divisions: 18,
+            max: 80,
+            divisions: 78,
             activeColor: const Color(0xFF1565C0),
             onChanged: (v) {
               setState(() => _maxSalary = v);

@@ -22,6 +22,7 @@ class ResumeAtsEvaluation {
   final int pageCount;
   final List<ResumeAtsCategory> categories;
   final List<String> missingKeywords;
+  final List<String> suggestions;
 
   const ResumeAtsEvaluation({
     required this.score,
@@ -29,6 +30,7 @@ class ResumeAtsEvaluation {
     required this.pageCount,
     required this.categories,
     required this.missingKeywords,
+    required this.suggestions,
   });
 
   String get level {
@@ -147,15 +149,9 @@ class ResumeAtsService {
         .toList();
     final wordCount = words.length;
 
-    final readablePoints = wordCount >= 450
-        ? 15
-        : wordCount >= 300
-        ? 13
-        : wordCount >= 180
-        ? 10
-        : wordCount >= 100
-        ? 7
-        : 3;
+    // Scale this continuously so resumes near a threshold do not all receive
+    // the same points for noticeably different amounts of readable content.
+    final readablePoints = (wordCount * 15 / 450).round().clamp(0, 15).toInt();
 
     final hasEmail = RegExp(r'[\w.+-]+@[\w-]+(?:\.[\w-]+)+')
         .hasMatch(normalized);
@@ -220,19 +216,9 @@ class ResumeAtsService {
     final actionVerbCount = _actionVerbs
         .where((verb) => _containsTerm(lower, verb))
         .length;
-    final impactPoints =
-        (metricCount >= 3
-            ? 7
-            : metricCount >= 1
-            ? 4
-            : 0) +
-        (actionVerbCount >= 4
-            ? 8
-            : actionVerbCount >= 2
-            ? 5
-            : actionVerbCount >= 1
-            ? 3
-            : 0);
+    final metricPoints = (metricCount.clamp(0, 5) * 7 / 5).round();
+    final actionPoints = (actionVerbCount.clamp(0, 5) * 8 / 5).round();
+    final impactPoints = metricPoints + actionPoints;
 
     final layoutPoints = pageCount <= 2
         ? 10
@@ -300,6 +286,30 @@ class ResumeAtsService {
       ),
     ];
     final score = categories.fold<int>(0, (sum, item) => sum + item.points);
+    final suggestions = <String>[
+      if (!hasSummary)
+        'Add a 2–3 line summary tailored to ${targetJob.title}. Example structure: “${targetJob.title} with experience in [relevant skills]. Delivered [real result] by [what you did].” Replace every bracket with details that are true for you.',
+      if (!hasExperience) 'Add a clearly titled Experience section. For each role or project, include your title, organization, dates, and 2–4 concise achievement bullets.',
+      if (!hasSkills) 'Add a Skills section and list the tools, methods, and job skills you can actually use.',
+      if (missingKeywords.isNotEmpty)
+        'Compare the job description with your experience. Add relevant terms where they accurately describe your work: ${missingKeywords.take(8).join(', ')}.',
+      if (metricCount == 0 || actionVerbCount < 2) 'Strengthen experience bullets with action + task + real outcome. Example: “Improved [process] by [X%] using [tool], helping [team/customer] achieve [result].” Do not guess or invent numbers.',
+      if (!hasEmail || !hasPhone)
+        'Put a selectable-text email and phone number near the top of the resume${!hasEmail && !hasPhone
+            ? '.'
+            : !hasEmail
+            ? ' and add your email.'
+            : ' and add your phone number.'}',
+      if (!hasEducation) 'Add an Education section with your qualification, institution, and graduation year if relevant to the role.',
+      if (wordCount < 300) 'Add useful detail about relevant responsibilities, projects, tools, and outcomes. Avoid filler; include only information that supports this application.',
+      if (pageCount > 2) 'Review whether older or unrelated details can be shortened so the most relevant experience is easy to find.',
+      if (score >= 90 && missingKeywords.isEmpty) 'Your checklist is already strong for this role. Review the job description once more and keep only accurate, relevant details.',
+    ];
+    if (suggestions.isEmpty) {
+      suggestions.add(
+        'Your resume covers the main checklist items. Tailor your strongest experience bullets to this job and keep every claim accurate.',
+      );
+    }
 
     return ResumeAtsEvaluation(
       score: score.clamp(0, 100).toInt(),
@@ -307,6 +317,7 @@ class ResumeAtsService {
       pageCount: pageCount,
       categories: categories,
       missingKeywords: missingKeywords,
+      suggestions: suggestions,
     );
   }
 

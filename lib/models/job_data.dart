@@ -1,6 +1,97 @@
 import 'job.dart';
 
-final List<Job> sampleJobs = [..._curatedJobs, ..._generatedCategoryJobs()];
+final List<Job> sampleJobs = [
+  ..._curatedJobs,
+  ..._topTierJobs,
+  ..._generatedCategoryJobs(),
+];
+
+const _topTierJobs = [
+  Job(
+    id: 'top-tier-google-senior-software-engineer',
+    title: 'Senior Software Engineer',
+    company: 'Google',
+    location: 'Bengaluru, India',
+    type: 'Full-time',
+    salary: '₹40,00,000 - ₹80,00,000/yr · indicative',
+    description:
+        'Illustrative top-tier sample listing for a senior software engineering role. This is not a verified active vacancy or an official Google compensation offer. Check Google Careers for current openings and pay details.',
+    requirements: [
+      'Software engineering experience',
+      'Data structures and algorithms',
+      'Distributed systems',
+      'Programming in Java, Go, C++, or Python',
+    ],
+    distanceKm: 0,
+    postedDate: 'Sample listing',
+    category: 'Technology',
+    cardColor: 0xFF4285F4,
+    isTopTier: true,
+  ),
+  Job(
+    id: 'top-tier-microsoft-senior-software-engineer',
+    title: 'Senior Software Engineer',
+    company: 'Microsoft',
+    location: 'Hyderabad, India',
+    type: 'Full-time',
+    salary: '₹40,00,000 - ₹75,00,000/yr · indicative',
+    description:
+        'Illustrative top-tier sample listing for a senior software engineering role. This is not a verified active vacancy or an official Microsoft compensation offer. Check Microsoft Careers for current openings and pay details.',
+    requirements: [
+      'Software engineering experience',
+      'Cloud services and distributed systems',
+      'Data structures and algorithms',
+      'Programming in C#, Java, or Python',
+    ],
+    distanceKm: 0,
+    postedDate: 'Sample listing',
+    category: 'Technology',
+    cardColor: 0xFF00A4EF,
+    isTopTier: true,
+  ),
+  Job(
+    id: 'top-tier-salesforce-senior-software-engineer',
+    title: 'Senior Software Engineer',
+    company: 'Salesforce',
+    location: 'Bengaluru, India',
+    type: 'Full-time',
+    salary: '₹40,00,000 - ₹70,00,000/yr · indicative',
+    description:
+        'Illustrative top-tier sample listing for a senior software engineering role. This is not a verified active vacancy or an official Salesforce compensation offer. Check Salesforce Careers for current openings and pay details.',
+    requirements: [
+      'Software engineering experience',
+      'Scalable backend services',
+      'Cloud platforms and APIs',
+      'Programming in Java, JavaScript, or Python',
+    ],
+    distanceKm: 0,
+    postedDate: 'Sample listing',
+    category: 'Technology',
+    cardColor: 0xFF00A1E0,
+    isTopTier: true,
+  ),
+  Job(
+    id: 'top-tier-bloomberg-software-engineer',
+    title: 'Software Engineer, Data Platforms',
+    company: 'Bloomberg',
+    location: 'Mumbai, India',
+    type: 'Full-time',
+    salary: '₹40,00,000 - ₹75,00,000/yr · indicative',
+    description:
+        'Illustrative top-tier sample listing for a software engineering role on data platforms. This is not a verified active vacancy or an official Bloomberg compensation offer. Check Bloomberg Careers for current openings and pay details.',
+    requirements: [
+      'Software engineering experience',
+      'Data structures and algorithms',
+      'Distributed data systems',
+      'Programming in C++, Java, or Python',
+    ],
+    distanceKm: 0,
+    postedDate: 'Sample listing',
+    category: 'Technology',
+    cardColor: 0xFF1D4ED8,
+    isTopTier: true,
+  ),
+];
 
 final List<Job> _curatedJobs = [
   const Job(

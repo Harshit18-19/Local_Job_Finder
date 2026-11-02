@@ -148,17 +148,23 @@ class _JobCardState extends State<JobCard> {
                   ],
                 ),
                 const SizedBox(height: 14),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
                     _Chip(
                       label: widget.job.type,
                       color: _typeColor(widget.job.type),
                     ),
-                    const SizedBox(width: 8),
                     _Chip(
                       label: widget.job.category,
                       color: accent,
                     ),
+                    if (widget.job.isTopTier)
+                      const _Chip(
+                        label: 'TOP TIER',
+                        color: Color(0xFF7C3AED),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -174,13 +180,15 @@ class _JobCardState extends State<JobCard> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(Icons.near_me_outlined,
-                        size: 13, color: Colors.grey[400]),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${widget.job.distanceKm} km',
-                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                    ),
+                    if (!widget.job.isTopTier) ...[
+                      Icon(Icons.near_me_outlined,
+                          size: 13, color: Colors.grey[400]),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${widget.job.distanceKm} km',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                      ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -197,24 +205,33 @@ class _JobCardState extends State<JobCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        Icon(Icons.star_rounded, size: 14, color: Colors.amber[600]),
-                        const SizedBox(width: 3),
-                        Text(
-                          widget.job.rating.toString(),
-                          style: const TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 12),
-                        Icon(Icons.people_outline, size: 14, color: Colors.grey[400]),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${widget.job.applicants} applied',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                        ),
-                      ],
-                    ),
+                    if (widget.job.isTopTier)
+                      Text(
+                        'Sample listing · verify current roles with the company',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 10),
+                      )
+                    else
+                      Row(
+                        children: [
+                          Icon(Icons.star_rounded,
+                              size: 14, color: Colors.amber[600]),
+                          const SizedBox(width: 3),
+                          Text(
+                            widget.job.rating.toString(),
+                            style: const TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 12),
+                          Icon(Icons.people_outline,
+                              size: 14, color: Colors.grey[400]),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${widget.job.applicants} applied',
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey[500]),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ],

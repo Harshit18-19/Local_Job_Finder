@@ -13,6 +13,7 @@ class Job {
   final double rating;
   final int applicants;
   final int cardColor; // ARGB int for gradient
+  final bool isTopTier;
 
   const Job({
     required this.id,
@@ -29,5 +30,6 @@ class Job {
     this.rating = 4.0,
     this.applicants = 0,
     this.cardColor = 0xFF2563EB,
+    this.isTopTier = false,
   });
 }
