@@ -4,8 +4,10 @@ class JobApplication {
   final String id;
   final String jobId;
   final String jobTitle;
+  final String category;
   final String company;
   final String status;
+  final int stageIndex;
   final String applicantName;
   final String applicantEmail;
   final String applicantPhone;
@@ -19,8 +21,10 @@ class JobApplication {
     required this.id,
     required this.jobId,
     required this.jobTitle,
+    required this.category,
     required this.company,
     required this.status,
+    required this.stageIndex,
     required this.applicantName,
     required this.applicantEmail,
     required this.applicantPhone,
@@ -39,8 +43,10 @@ class JobApplication {
       id: doc.id,
       jobId: data['jobId'] as String? ?? '',
       jobTitle: data['jobTitle'] as String? ?? 'Job',
+      category: data['category'] as String? ?? '',
       company: data['company'] as String? ?? '',
       status: data['status'] as String? ?? 'pending',
+      stageIndex: data['stageIndex'] as int? ?? 0,
       applicantName: data['applicantName'] as String? ?? '',
       applicantEmail: data['applicantEmail'] as String? ?? '',
       applicantPhone: data['applicantPhone'] as String? ?? '',
@@ -57,8 +63,10 @@ class JobApplication {
       id: data['id'] as String? ?? '',
       jobId: data['jobId'] as String? ?? '',
       jobTitle: data['jobTitle'] as String? ?? 'Job',
+      category: data['category'] as String? ?? '',
       company: data['company'] as String? ?? '',
       status: data['status'] as String? ?? 'local',
+      stageIndex: data['stageIndex'] as int? ?? 0,
       applicantName: data['applicantName'] as String? ?? '',
       applicantEmail: data['applicantEmail'] as String? ?? '',
       applicantPhone: data['applicantPhone'] as String? ?? '',
@@ -69,5 +77,32 @@ class JobApplication {
         data['createdAtMs'] as int? ?? 0,
       ),
     );
+  }
+
+  List<String> get interviewStages {
+    final searchable = '${category.toLowerCase()} ${jobTitle.toLowerCase()}';
+    final isTechnical =
+        searchable.contains('technolog') ||
+        searchable.contains('software') ||
+        searchable.contains('engineer') ||
+        searchable.contains('data') ||
+        searchable.contains('it');
+    return isTechnical
+        ? const [
+            'Applied',
+            'Resume review',
+            'Coding assessment',
+            'Technical interview',
+            'HR interview',
+            'Decision',
+          ]
+        : const [
+            'Applied',
+            'Application review',
+            'Initial interview',
+            'Role interview',
+            'Final interview',
+            'Decision',
+          ];
   }
 }

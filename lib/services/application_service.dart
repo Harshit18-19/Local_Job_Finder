@@ -57,8 +57,10 @@ class ApplicationService {
       'coverLetter': coverLetter,
       'jobId': job.id,
       'jobTitle': job.title,
+      'category': job.category,
       'company': job.company,
       'status': 'local',
+      'stageIndex': 0,
       'createdAtMs': DateTime.now().millisecondsSinceEpoch,
     };
     await AppliedJobsService.addApplication(localApplication);
@@ -76,8 +78,10 @@ class ApplicationService {
             'coverLetter': coverLetter,
             'jobId': job.id,
             'jobTitle': job.title,
+            'category': job.category,
             'company': job.company,
             'status': 'pending',
+            'stageIndex': 0,
             'createdAt': FieldValue.serverTimestamp(),
             'updatedAt': FieldValue.serverTimestamp(),
           })
@@ -148,6 +152,14 @@ class ApplicationService {
     'status': status,
     'reviewerNote': note?.trim().isEmpty ?? true ? null : note!.trim(),
     'reviewedAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+  });
+
+  static Future<void> advanceStage({
+    required String applicationId,
+    required int stageIndex,
+  }) => _applications.doc(applicationId).update({
+    'stageIndex': stageIndex,
     'updatedAt': FieldValue.serverTimestamp(),
   });
 }

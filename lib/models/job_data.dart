@@ -6,7 +6,7 @@ final List<Job> sampleJobs = [
   ..._generatedCategoryJobs(),
 ];
 
-const _topTierJobs = [
+final _topTierJobs = [
   Job(
     id: 'top-tier-google-senior-software-engineer',
     title: 'Senior Software Engineer',
@@ -91,7 +91,112 @@ const _topTierJobs = [
     cardColor: 0xFF1D4ED8,
     isTopTier: true,
   ),
+  _topTierJob(
+    id: 'amazon-sde', title: 'Software Development Engineer', company: 'Amazon',
+    location: 'Bengaluru, India', salary: '₹25,00,000 - ₹55,00,000/yr · indicative',
+    requirements: ['Data structures and algorithms', 'Java, C++, or Python', 'Distributed systems'], color: 0xFFFF9900,
+  ),
+  _topTierJob(
+    id: 'adobe-software-engineer', title: 'Software Engineer', company: 'Adobe',
+    location: 'Noida, India', salary: '₹25,00,000 - ₹50,00,000/yr · indicative',
+    requirements: ['Computer science fundamentals', 'Java or C++', 'Problem solving'], color: 0xFFEB1000,
+  ),
+  _topTierJob(
+    id: 'ibm-cloud-engineer', title: 'Cloud Software Engineer', company: 'IBM',
+    location: 'Bengaluru, India', salary: '₹12,00,000 - ₹30,00,000/yr · indicative',
+    requirements: ['Cloud platforms', 'Containers and Kubernetes', 'Java, Go, or Python'], color: 0xFF0F62FE,
+  ),
+  _topTierJob(
+    id: 'oracle-developer', title: 'Software Developer', company: 'Oracle',
+    location: 'Bengaluru, India', salary: '₹15,00,000 - ₹35,00,000/yr · indicative',
+    requirements: ['SQL and databases', 'Java or Python', 'Cloud applications'], color: 0xFFC74634,
+  ),
+  _topTierJob(
+    id: 'accenture-consultant', title: 'Technology Consultant', company: 'Accenture',
+    location: 'Hyderabad, India', salary: '₹8,00,000 - ₹22,00,000/yr · indicative',
+    requirements: ['Software development', 'Client communication', 'Cloud or data technologies'], color: 0xFFA100FF,
+  ),
+  _topTierJob(
+    id: 'deloitte-analyst', title: 'Technology Analyst', company: 'Deloitte',
+    location: 'Pune, India', salary: '₹7,00,000 - ₹18,00,000/yr · indicative',
+    requirements: ['Programming fundamentals', 'Analytical thinking', 'Communication skills'], color: 0xFF86BC25,
+  ),
+  _topTierJob(
+    id: 'tcs-software-engineer', title: 'Software Engineer', company: 'Tata Consultancy Services',
+    location: 'Chennai, India', salary: '₹4,00,000 - ₹12,00,000/yr · indicative',
+    requirements: ['Java, Python, or .NET', 'Database basics', 'Team collaboration'], color: 0xFF5B2C91,
+  ),
+  _topTierJob(
+    id: 'infosys-specialist-programmer', title: 'Specialist Programmer', company: 'Infosys',
+    location: 'Mysuru, India', salary: '₹7,00,000 - ₹18,00,000/yr · indicative',
+    requirements: ['Data structures and algorithms', 'Java, Python, or JavaScript', 'Full-stack development'], color: 0xFF007CC3,
+  ),
+  _topTierJob(
+    id: 'nvidia-systems-engineer', title: 'Systems Software Engineer', company: 'NVIDIA',
+    location: 'Pune, India', salary: '₹25,00,000 - ₹55,00,000/yr · indicative',
+    requirements: ['C++ programming', 'Operating systems', 'Computer architecture'], color: 0xFF76B900,
+  ),
+  _topTierJob(
+    id: 'intel-design-engineer', title: 'Design Engineer', company: 'Intel',
+    location: 'Bengaluru, India', salary: '₹15,00,000 - ₹35,00,000/yr · indicative',
+    requirements: ['Computer engineering', 'Digital design or verification', 'SystemVerilog or C++'], color: 0xFF0071C5,
+  ),
+  _topTierJob(
+    id: 'cisco-network-engineer', title: 'Network Software Engineer', company: 'Cisco',
+    location: 'Bengaluru, India', salary: '₹15,00,000 - ₹35,00,000/yr · indicative',
+    requirements: ['Networking fundamentals', 'Python or C++', 'Linux'], color: 0xFF049FD9,
+  ),
+  _topTierJob(
+    id: 'jpmorgan-analyst', title: 'Software Engineer', company: 'JPMorgan Chase',
+    location: 'Mumbai, India', salary: '₹18,00,000 - ₹40,00,000/yr · indicative',
+    requirements: ['Java or Python', 'SQL', 'Financial services interest'], color: 0xFF005EB8,
+  ),
+  _topTierJob(
+    id: 'goldman-sachs-engineer', title: 'Engineering Analyst', company: 'Goldman Sachs',
+    location: 'Bengaluru, India', salary: '₹18,00,000 - ₹40,00,000/yr · indicative',
+    requirements: ['Programming in Java, Python, or C++', 'Data structures', 'Analytical skills'], color: 0xFF6D6E71,
+  ),
+  _topTierJob(
+    id: 'uber-engineer', title: 'Software Engineer', company: 'Uber',
+    location: 'Hyderabad, India', salary: '₹25,00,000 - ₹55,00,000/yr · indicative',
+    requirements: ['Backend development', 'Distributed systems', 'Java, Go, or Python'], color: 0xFF000000,
+  ),
+  _topTierJob(
+    id: 'meta-engineer', title: 'Software Engineer', company: 'Meta',
+    location: 'Gurugram, India', salary: '₹35,00,000 - ₹75,00,000/yr · indicative',
+    requirements: ['Data structures and algorithms', 'C++, Java, or Python', 'Large-scale systems'], color: 0xFF0866FF,
+  ),
+  _topTierJob(
+    id: 'apple-engineer', title: 'Software Engineer', company: 'Apple',
+    location: 'Hyderabad, India', salary: '₹25,00,000 - ₹60,00,000/yr · indicative',
+    requirements: ['Software engineering fundamentals', 'Swift, Objective-C, or C++', 'Product focus'], color: 0xFF555555,
+  ),
 ];
+
+Job _topTierJob({
+  required String id,
+  required String title,
+  required String company,
+  required String location,
+  required String salary,
+  required List<String> requirements,
+  required int color,
+}) => Job(
+  id: 'top-tier-$id',
+  title: title,
+  company: company,
+  location: location,
+  type: 'Full-time',
+  salary: salary,
+  description:
+      'Illustrative sample listing for a role at $company. This is not a verified active vacancy or an official compensation offer. Check $company Careers for current openings and pay details.',
+  requirements: requirements,
+  distanceKm: 0,
+  postedDate: 'Sample listing',
+  category: 'Technology',
+  cardColor: color,
+  isTopTier: true,
+);
 
 final List<Job> _curatedJobs = [
   const Job(
