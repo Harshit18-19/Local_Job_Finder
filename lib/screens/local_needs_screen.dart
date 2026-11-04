@@ -6,7 +6,9 @@ import '../widgets/job_card.dart';
 import 'job_detail_screen.dart';
 
 class LocalNeedsScreen extends StatefulWidget {
-  const LocalNeedsScreen({super.key});
+  final bool isJobAlerts;
+
+  const LocalNeedsScreen({super.key, this.isJobAlerts = false});
 
   @override
   State<LocalNeedsScreen> createState() => _LocalNeedsScreenState();
@@ -110,44 +112,57 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
     return Scaffold(
       backgroundColor:
           isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F7FC),
-      appBar: AppBar(title: const Text('Local Hiring Pulse')),
+      appBar: AppBar(
+        title: Text(
+          widget.isJobAlerts ? 'Job Alerts & Matches' : 'Local Hiring Pulse',
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           _introCard(),
           const SizedBox(height: 22),
-          _sectionHeading('What employers need',
-              'Common requirements in the current local listings'),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _topNeeds.map((need) {
-              final selected = _selectedNeed == need.key;
-              return FilterChip(
-                selected: selected,
-                label: Text('${need.key} · ${need.value}'),
-                onSelected: (_) =>
-                    setState(() => _selectedNeed = selected ? null : need.key),
-                selectedColor: const Color(0xFF2563EB).withValues(alpha: 0.16),
-                checkmarkColor: const Color(0xFF2563EB),
-                labelStyle: TextStyle(
-                  color: selected ? const Color(0xFF1D4ED8) : null,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-                backgroundColor:
-                    isDark ? const Color(0xFF1E293B) : Colors.white,
-                side: BorderSide(
-                    color: selected
-                        ? const Color(0xFF2563EB)
-                        : (isDark ? Colors.white12 : Colors.black12)),
-              );
-            }).toList(),
-          ),
+          if (widget.isJobAlerts) ...[
+            _alertSummary(matches.length, isDark),
+            const SizedBox(height: 22),
+          ] else ...[
+            _sectionHeading('What employers need',
+                'Common requirements in the current local listings'),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _topNeeds.map((need) {
+                final selected = _selectedNeed == need.key;
+                return FilterChip(
+                  selected: selected,
+                  label: Text('${need.key} · ${need.value}'),
+                  onSelected: (_) => setState(
+                      () => _selectedNeed = selected ? null : need.key),
+                  selectedColor:
+                      const Color(0xFF2563EB).withValues(alpha: 0.16),
+                  checkmarkColor: const Color(0xFF2563EB),
+                  labelStyle: TextStyle(
+                    color: selected ? const Color(0xFF1D4ED8) : null,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  backgroundColor:
+                      isDark ? const Color(0xFF1E293B) : Colors.white,
+                  side: BorderSide(
+                      color: selected
+                          ? const Color(0xFF2563EB)
+                          : (isDark ? Colors.white12 : Colors.black12)),
+                );
+              }).toList(),
+            ),
+          ],
           const SizedBox(height: 24),
-          _sectionHeading('What do you need?',
-              'Set your work preferences to find a better fit'),
+          _sectionHeading(
+              widget.isJobAlerts ? 'Alert preferences' : 'What do you need?',
+              widget.isJobAlerts
+                  ? 'Choose what kind of jobs should appear in your matches'
+                  : 'Set your work preferences to find a better fit'),
           const SizedBox(height: 12),
           TextField(
             controller: _locationController,
@@ -218,7 +233,10 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
           Row(
             children: [
               Expanded(
-                child: Text('Skills you bring',
+                child: Text(
+                    widget.isJobAlerts
+                        ? 'Match by your skills'
+                        : 'Skills you bring',
                     style: TextStyle(
                         color: isDark ? Colors.white70 : Colors.black54,
                         fontSize: 13,
@@ -229,7 +247,10 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text('Choose requirements you can meet; matching jobs rank first.',
+          Text(
+              widget.isJobAlerts
+                  ? 'Choose skills you have; stronger matches rank higher.'
+                  : 'Choose requirements you can meet; matching jobs rank first.',
               style: TextStyle(color: Colors.grey[500], fontSize: 11)),
           const SizedBox(height: 8),
           Wrap(
@@ -257,7 +278,10 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
           Row(
             children: [
               Expanded(
-                child: Text('Matching opportunities',
+                child: Text(
+                    widget.isJobAlerts
+                        ? 'Jobs matching your alerts'
+                        : 'Matching opportunities',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                         )),
@@ -275,7 +299,9 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
                   const Icon(Icons.search_off_rounded,
                       size: 42, color: Color(0xFF94A3B8)),
                   const SizedBox(height: 10),
-                  const Text('No roles match these needs yet'),
+                  Text(widget.isJobAlerts
+                      ? 'No jobs match these alert preferences yet'
+                      : 'No roles match these needs yet'),
                   TextButton(
                     onPressed: () {
                       setState(() {
@@ -318,7 +344,9 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
                 ]),
           const SizedBox(height: 8),
           Text(
-            'Demand insights use the job listings currently shown in Local Job Finder.',
+            widget.isJobAlerts
+                ? 'Matches refresh from the job listings available in the app.'
+                : 'Demand insights use the job listings currently shown in Local Job Finder.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.grey[500], fontSize: 11),
           ),
@@ -326,6 +354,34 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
       ),
     );
   }
+
+  Widget _alertSummary(int matchCount, bool isDark) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1B4B) : const Color(0xFFF3E8FF),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.notifications_active_outlined,
+                color: Color(0xFF7C3AED), size: 26),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('$matchCount jobs match your alerts',
+                      style: const TextStyle(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 3),
+                  Text('Based on your saved category, area and work type.',
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
 
   Widget _introCard() => Container(
         padding: const EdgeInsets.all(18),
@@ -335,20 +391,31 @@ class _LocalNeedsScreenState extends State<LocalNeedsScreen> {
           ),
           borderRadius: BorderRadius.circular(22),
         ),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.groups_rounded, color: Colors.white, size: 28),
-            SizedBox(height: 12),
-            Text('Connect local needs to local work',
+            Icon(
+              widget.isJobAlerts
+                  ? Icons.notifications_active_rounded
+                  : Icons.groups_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
+            const SizedBox(height: 12),
+            Text(widget.isJobAlerts
+                    ? 'Get job matches that fit you'
+                    : 'Connect local needs to local work',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 19,
                     fontWeight: FontWeight.w800)),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'See what nearby companies ask for, then match opportunities to your skills, area and schedule.',
-              style: TextStyle(color: Colors.white, height: 1.4, fontSize: 13),
+              widget.isJobAlerts
+                  ? 'Choose your preferred category, area, work type and skills to see matching openings.'
+                  : 'See what nearby companies ask for, then match opportunities to your skills, area and schedule.',
+              style: const TextStyle(
+                  color: Colors.white, height: 1.4, fontSize: 13),
             ),
           ],
         ),
