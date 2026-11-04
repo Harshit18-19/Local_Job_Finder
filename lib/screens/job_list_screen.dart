@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../main.dart';
 import '../models/job.dart';
 import '../models/job_data.dart';
@@ -40,6 +41,10 @@ class _JobListScreenState extends State<JobListScreen>
   String _userName = '';
   String _userEmail = '';
   bool _isReviewer = false;
+  String _alertCategory = 'All';
+  String _alertType = 'All';
+  String _alertArea = '';
+  bool _alertPreferencesLoaded = false;
 
   final _categories = [
     'All',
@@ -88,6 +93,7 @@ class _JobListScreenState extends State<JobListScreen>
         vsync: this, duration: const Duration(milliseconds: 600));
     _headerAnim.forward();
     _loadUser();
+    _loadJobAlertPreferences();
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
         setState(() {
@@ -119,6 +125,30 @@ class _JobListScreenState extends State<JobListScreen>
       });
     }
   }
+
+  Future<void> _loadJobAlertPreferences() async {
+    final preferences = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _alertCategory =
+          preferences.getString('job_seeker_preferred_category') ?? 'All';
+      _alertType = preferences.getString('job_seeker_preferred_type') ?? 'All';
+      _alertArea = preferences.getString('job_seeker_preferred_area') ?? '';
+      _alertPreferencesLoaded = true;
+    });
+  }
+
+  List<Job> get _alertMatches {
+    final area = _alertArea.trim().toLowerCase();
+    return sampleJobs.where((job) {
+      return (_alertCategory == 'All' || job.category == _alertCategory) &&
+          (_alertType == 'All' || job.type == _alertType) &&
+          (area.isEmpty || job.location.toLowerCase().contains(area));
+    }).toList();
+  }
+
+  bool get _hasAlertPreferences =>
+      _alertCategory != 'All' || _alertType != 'All' || _alertArea.isNotEmpty;
 
   void _applyFilters() {
     final query = _searchController.text.toLowerCase();
@@ -187,6 +217,8 @@ class _JobListScreenState extends State<JobListScreen>
           SliverToBoxAdapter(child: _buildStatsRow(isDark)),
           if (!_loading && !_searchFocused)
             SliverToBoxAdapter(child: _buildLocalNeedsCard(isDark)),
+          if (!_loading && !_searchFocused)
+            SliverToBoxAdapter(child: _buildJobAlertsCard(isDark)),
           SliverToBoxAdapter(child: _buildCategoryChips(isDark)),
           if (!_loading && !_searchFocused && _selectedCategory == 'All')
             SliverToBoxAdapter(child: _buildFeaturedSection()),
@@ -545,6 +577,79 @@ class _JobListScreenState extends State<JobListScreen>
         ),
       ),
     );
+  }
+
+  Widget _buildJobAlertsCard(bool isDark) {
+    final details = [
+      if (_alertCategory != 'All') _alertCategory,
+      if (_alertType != 'All') _alertType,
+      if (_alertArea.trim().isNotEmpty) _alertArea.trim(),
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Material(
+        color: isDark ? const Color(0xFF1E1B4B) : const Color(0xFFF3E8FF),
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: _openJobAlerts,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7C3AED).withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.notifications_active_outlined,
+                      color: Color(0xFF7C3AED)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Your Job Alerts',
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+                      Text(
+                        !_alertPreferencesLoaded
+                            ? 'Loading your preferences…'
+                            : !_hasAlertPreferences
+                                ? 'Set your preferred category, area and work type'
+                                : '${_alertMatches.length} matching jobs · ${details.join(' · ')}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.3,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.arrow_forward_ios_rounded,
+                    size: 16, color: Color(0xFF7C3AED)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openJobAlerts() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) => const LocalNeedsScreen(isJobAlerts: true)),
+    ).then((_) => _loadJobAlertPreferences());
   }
 
   Widget _statCard(
@@ -961,7 +1066,11 @@ class _JobListScreenState extends State<JobListScreen>
                       );
                     }),
                     _profileMenuTile(Icons.notifications_none_rounded,
-                        'Job alerts', 'Manage alerts and recommendations'),
+                        'Job alerts', 'Manage your personalized job matches',
+                        onTap: () {
+                      Navigator.pop(context);
+                      _openJobAlerts();
+                    }),
                     _profileMenuTile(Icons.tune_rounded, 'Search preferences',
                         'Location, salary and work style'),
                   ],
