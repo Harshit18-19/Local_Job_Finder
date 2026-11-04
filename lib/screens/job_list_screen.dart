@@ -170,6 +170,7 @@ class _JobListScreenState extends State<JobListScreen>
 
   List<Job> get _featuredJobs =>
       sampleJobs.where((j) => j.rating >= 4.5).toList();
+  List<Job> get _mncJobs => sampleJobs.where((job) => job.isTopTier).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +190,8 @@ class _JobListScreenState extends State<JobListScreen>
           SliverToBoxAdapter(child: _buildCategoryChips(isDark)),
           if (!_loading && !_searchFocused && _selectedCategory == 'All')
             SliverToBoxAdapter(child: _buildFeaturedSection()),
+          if (!_loading && !_searchFocused && _selectedCategory == 'All')
+            SliverToBoxAdapter(child: _buildMncSection()),
           SliverToBoxAdapter(child: _buildResultsHeader()),
           if (_loading)
             SliverList(
@@ -728,6 +731,66 @@ class _JobListScreenState extends State<JobListScreen>
               itemBuilder: (_, i) => FeaturedJobCard(
                 job: _featuredJobs[i],
                 onTap: () => _openDetail(_featuredJobs[i]),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMncSection() {
+    return FadeInLeft(
+      duration: const Duration(milliseconds: 550),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6D28D9).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.public_rounded,
+                      color: Color(0xFF6D28D9), size: 20),
+                ),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('MNC Companies',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w800)),
+                      SizedBox(height: 2),
+                      Text('Explore roles from leading global employers',
+                          style: TextStyle(fontSize: 11, color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                Text('${_mncJobs.length} companies',
+                    style: const TextStyle(
+                        color: Color(0xFF6D28D9),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 185,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(left: 16),
+              itemCount: _mncJobs.length,
+              itemBuilder: (_, index) => FeaturedJobCard(
+                job: _mncJobs[index],
+                onTap: () => _openDetail(_mncJobs[index]),
               ),
             ),
           ),

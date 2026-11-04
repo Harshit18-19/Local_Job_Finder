@@ -62,9 +62,11 @@ reject a pending application; the applicant's **Applied jobs** screen updates
 immediately.
 
 The deployed function writes a reviewer notification when a new Firestore
-application is created. Firestore rules prevent applicants from changing their
-application after submission and prevent non-reviewers from reading the review
-queue.
+application is created. Reviewers can advance pending applications through the
+role-based interview stages or approve/reject them. Applicant progress updates
+come from the Firestore application document in real time. Firestore rules
+prevent applicants from changing their application after submission and
+prevent non-reviewers from reading the review queue.
 
 ## Verify
 

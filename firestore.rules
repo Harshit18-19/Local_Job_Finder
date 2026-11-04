@@ -15,16 +15,27 @@ service cloud.firestore {
         && request.resource.data.status == 'pending'
         && request.resource.data.keys().hasOnly([
           'applicantId', 'applicantName', 'applicantEmail', 'applicantPhone',
-          'skills', 'profileUrl', 'coverLetter', 'jobId', 'jobTitle', 'company',
-          'status', 'createdAt', 'updatedAt'
-        ]);
+          'skills', 'profileUrl', 'coverLetter', 'jobId', 'jobTitle', 'category',
+          'company', 'status', 'stageIndex', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.category is string
+        && request.resource.data.stageIndex == 0;
       allow read: if signedIn()
         && (resource.data.applicantId == request.auth.uid || reviewer());
-      allow update: if reviewer()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'status', 'reviewerNote', 'reviewedAt', 'updatedAt'
-        ])
-        && request.resource.data.status in ['approved', 'rejected'];
+      allow update: if reviewer() && (
+        (
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['stageIndex', 'updatedAt'])
+          && resource.data.status == 'pending'
+          && request.resource.data.stageIndex is int
+          && request.resource.data.stageIndex > resource.data.stageIndex
+          && request.resource.data.stageIndex <= 5
+        ) || (
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'reviewerNote', 'reviewedAt', 'updatedAt'])
+          && request.resource.data.status in ['approved', 'rejected']
+        )
+      );
       allow delete: if false;
     }
 

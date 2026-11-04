@@ -89,20 +89,24 @@ class FeaturedJobCard extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.star_rounded,
-                                size: 13, color: Colors.amber),
-                            const SizedBox(width: 3),
-                            Text(
-                              job.rating.toString(),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ],
-                        ),
+                        child: job.isTopTier
+                            ? const Text('MNC',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800))
+                            : Row(
+                                children: [
+                                  const Icon(Icons.star_rounded,
+                                      size: 13, color: Colors.amber),
+                                  const SizedBox(width: 3),
+                                  Text(job.rating.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600)),
+                                ],
+                              ),
                       ),
                     ],
                   ),
@@ -134,7 +138,11 @@ class FeaturedJobCard extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.8)),
                       const SizedBox(width: 4),
                       Text(
-                        '${job.distanceKm} km away',
+                        job.isTopTier
+                            ? job.location
+                            : '${job.distanceKm} km away',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12),
