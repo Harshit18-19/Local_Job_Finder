@@ -155,9 +155,9 @@ class _ApplyScreenState extends State<ApplyScreen> {
                 ],
               ),
             ),
-            _buildBottomBar(accent),
           ],
         ),
+        bottomNavigationBar: _buildBottomBar(accent),
       ),
     );
   }
@@ -495,8 +495,9 @@ class _ApplyScreenState extends State<ApplyScreen> {
 
   Widget _buildBottomBar(Color accent) {
     return SafeArea(
+      top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         child: Row(
           children: [
             if (_step > 0)
@@ -504,7 +505,7 @@ class _ApplyScreenState extends State<ApplyScreen> {
                 padding: const EdgeInsets.only(right: 12),
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(52, 52),
+                    minimumSize: const Size(52, 48),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
                     side: BorderSide(color: accent.withValues(alpha: 0.4)),
@@ -523,7 +524,7 @@ class _ApplyScreenState extends State<ApplyScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accent,
-                  minimumSize: const Size(double.infinity, 52),
+                  minimumSize: const Size(double.infinity, 48),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14)),
                 ),
