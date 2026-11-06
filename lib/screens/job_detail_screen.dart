@@ -35,7 +35,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 220,
+            // Top-tier listings include a badge in the flexible header, so
+            // give that header enough height below the safe-area inset.
+            expandedHeight: widget.job.isTopTier ? 252 : 220,
             pinned: true,
             backgroundColor: accent,
             foregroundColor: Colors.white,
@@ -126,6 +128,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           const SizedBox(height: 12),
                           Text(
                             widget.job.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 22,
@@ -135,6 +139,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           const SizedBox(height: 4),
                           Text(
                             widget.job.company,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 14,

@@ -141,11 +141,12 @@ class _ApplyScreenState extends State<ApplyScreen> {
           centerTitle: false,
           backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         ),
-        body: Column(
-          children: [
-            _buildProgressBar(accent, isDark),
-            _buildJobBanner(accent, isDark),
-            Expanded(
+        body: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildProgressBar(accent, isDark)),
+            SliverToBoxAdapter(child: _buildJobBanner(accent, isDark)),
+            SliverFillRemaining(
+              hasScrollBody: true,
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
@@ -269,11 +270,19 @@ class _ApplyScreenState extends State<ApplyScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(widget.job.title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 14)),
-                Text(widget.job.company,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                Text(
+                  widget.job.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 14),
+                ),
+                Text(
+                  widget.job.company,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -570,90 +579,94 @@ class _SuccessScreen extends StatelessWidget {
       backgroundColor:
           isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ZoomIn(
-                duration: const Duration(milliseconds: 500),
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF059669).withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.check_circle_rounded,
-                      color: Color(0xFF059669), size: 56),
-                ),
-              ),
-              const SizedBox(height: 28),
-              FadeInUp(
-                delay: const Duration(milliseconds: 200),
-                child: Text(
-                  sentToFirebase
-                      ? '🎉 Application Sent!'
-                      : 'Application Saved on Device',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 12),
-              FadeInUp(
-                delay: const Duration(milliseconds: 300),
-                child: Text(
-                  sentToFirebase
-                      ? 'Your application for ${job.title} at ${job.company} has been submitted successfully.'
-                      : 'Your application for ${job.title} at ${job.company} is saved in Applied Jobs on this device, but was not sent to the employer because Firebase is unavailable.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.grey[500], fontSize: 14, height: 1.6),
-                ),
-              ),
-              const SizedBox(height: 32),
-              FadeInUp(
-                delay: const Duration(milliseconds: 400),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: accent.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: accent.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ZoomIn(
+                      duration: const Duration(milliseconds: 500),
+                      child: Container(
+                        width: 100,
+                        height: 100,
                         decoration: BoxDecoration(
-                          color: accent,
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFF059669).withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
                         ),
-                        child: Center(
-                          child: Text(
-                            job.company[0],
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18),
-                          ),
-                        ),
+                        child: const Icon(Icons.check_circle_rounded,
+                            color: Color(0xFF059669), size: 56),
                       ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(job.title,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w700)),
-                          Text(job.company,
-                              style: TextStyle(
-                                  color: Colors.grey[500], fontSize: 13)),
-                        ],
+                    ),
+                    const SizedBox(height: 28),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 200),
+                      child: Text(
+                        sentToFirebase
+                            ? '🎉 Application Sent!'
+                            : 'Application Saved on Device',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 300),
+                      child: Text(
+                        sentToFirebase
+                            ? 'Your application for ${job.title} at ${job.company} has been submitted successfully.'
+                            : 'Your application for ${job.title} at ${job.company} is saved in Applied Jobs on this device, but was not sent to the employer because Firebase is unavailable.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.grey[500], fontSize: 14, height: 1.6),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    FadeInUp(
+                      delay: const Duration(milliseconds: 400),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: accent.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: accent,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  job.company[0],
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(job.title,
+                                    style:
+                                        const TextStyle(fontWeight: FontWeight.w700)),
+                                Text(job.company,
+                                    style: TextStyle(
+                                        color: Colors.grey[500], fontSize: 13)),
+                              ],
                       ),
                     ],
                   ),
@@ -694,6 +707,9 @@ class _SuccessScreen extends StatelessWidget {
                 label: const Text('View Applied Jobs'),
               ),
             ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
